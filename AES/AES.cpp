@@ -56,7 +56,10 @@ void ShiftRows(unsigned char* state) {
 }
 
 void MixColumns() {}
-void AddRoundKey(unsigned char* state, unsigned char* roundKey) {}
+void AddRoundKey(unsigned char* state, unsigned char* roundKey) {
+	for(int i = 0; i < 16; i++)
+		state[i] ^= roundKey[i]; // ^= means XOR
+}
 
 void AES_Encrypt(unsigned char* message, unsigned char* key){
 	unsigned char state[16];

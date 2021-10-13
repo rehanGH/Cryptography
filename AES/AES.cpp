@@ -13,7 +13,6 @@ void AES::KeyExpansionCore(unsigned char* in, unsigned char i){
 	in[2] = s_box[in[2]]; 	in[3] = s_box[in[3]];
 
 	// RCon
-
 	in[0] ^= rcon[i];
 }
 

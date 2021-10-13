@@ -1,4 +1,5 @@
 #include<iostream> 
+#include<cstring>
 using namespace std;
 
 unsigned char expandedKey[176];
@@ -154,25 +155,25 @@ void ShiftRows(unsigned char* state) {
 void MixColumns(unsigned char* state) {
 	unsigned char temp[16];
 
-	tmp[0] = (unsigned char)(mul2[state[0]] ^ mul3[state[1]] ^ state[2] ^ state[3]);
-	tmp[1] = (unsigned char)(state[0] ^ mul2[state[1]] ^ mul3[state[2]] ^ state[3]);
-	tmp[2] = (unsigned char)(state[0] ^ state[1] ^ mul2[state[2]] ^ mul3[state[3]]);
-	tmp[3] = (unsigned char)(mul3[state[0]] ^ state[1] ^ state[2] ^ mul2[state[3]]);
+	temp[0] = (unsigned char)(mul2[state[0]] ^ mul3[state[1]] ^ state[2] ^ state[3]);
+	temp[1] = (unsigned char)(state[0] ^ mul2[state[1]] ^ mul3[state[2]] ^ state[3]);
+	temp[2] = (unsigned char)(state[0] ^ state[1] ^ mul2[state[2]] ^ mul3[state[3]]);
+	temp[3] = (unsigned char)(mul3[state[0]] ^ state[1] ^ state[2] ^ mul2[state[3]]);
 
-	tmp[4] = (unsigned char)(mul2[state[4]] ^ mul3[state[5]] ^ state[6] ^ state[7]);
-	tmp[5] = (unsigned char)(state[4] ^ mul2[state[5]] ^ mul3[state[6]] ^ state[7]);
-	tmp[6] = (unsigned char)(state[4] ^ state[5] ^ mul2[state[6]] ^ mul3[state[7]]);
-	tmp[7] = (unsigned char)(mul3[state[4]] ^ state[5] ^ state[6] ^ mul2[state[7]]);
+	temp[4] = (unsigned char)(mul2[state[4]] ^ mul3[state[5]] ^ state[6] ^ state[7]);
+	temp[5] = (unsigned char)(state[4] ^ mul2[state[5]] ^ mul3[state[6]] ^ state[7]);
+	temp[6] = (unsigned char)(state[4] ^ state[5] ^ mul2[state[6]] ^ mul3[state[7]]);
+	temp[7] = (unsigned char)(mul3[state[4]] ^ state[5] ^ state[6] ^ mul2[state[7]]);
 
-	tmp[8] = (unsigned char)(mul2[state[8]] ^ mul3[state[9]] ^ state[10] ^ state[11]);
-	tmp[9] = (unsigned char)(state[8] ^ mul2[state[9]] ^ mul3[state[10]] ^ state[11]);
-	tmp[10] = (unsigned char)(state[8] ^ state[9] ^ mul2[state[10]] ^ mul3[state[11]]);
-	tmp[11] = (unsigned char)(mul3[state[8]] ^ state[9] ^ state[10] ^ mul2[state[11]]);
+	temp[8] = (unsigned char)(mul2[state[8]] ^ mul3[state[9]] ^ state[10] ^ state[11]);
+	temp[9] = (unsigned char)(state[8] ^ mul2[state[9]] ^ mul3[state[10]] ^ state[11]);
+	temp[10] = (unsigned char)(state[8] ^ state[9] ^ mul2[state[10]] ^ mul3[state[11]]);
+	temp[11] = (unsigned char)(mul3[state[8]] ^ state[9] ^ state[10] ^ mul2[state[11]]);
 
-	tmp[12] = (unsigned char)(mul2[state[12]] ^ mul3[state[13]] ^ state[14] ^ state[15]);
-	tmp[13] = (unsigned char)(state[12] ^ mul2[state[13]] ^ mul3[state[14]] ^ state[15]);
-	tmp[14] = (unsigned char)(state[12] ^ state[13] ^ mul2[state[14]] ^ mul3[state[15]]);
-	tmp[15] = (unsigned char)(mul3[state[12]] ^ state[13] ^ state[14] ^ mul2[state[15]]);
+	temp[12] = (unsigned char)(mul2[state[12]] ^ mul3[state[13]] ^ state[14] ^ state[15]);
+	temp[13] = (unsigned char)(state[12] ^ mul2[state[13]] ^ mul3[state[14]] ^ state[15]);
+	temp[14] = (unsigned char)(state[12] ^ state[13] ^ mul2[state[14]] ^ mul3[state[15]]);
+	temp[15] = (unsigned char)(mul3[state[12]] ^ state[13] ^ state[14] ^ mul2[state[15]]);
 
 	for(int i = 0; i < 16; i++)
 		state[i] = temp[i];
@@ -214,6 +215,18 @@ void AES_Encrypt(unsigned char* message, unsigned char* key){
 	
 }
 
+void printHex(unsigned char x){
+	if(x / 16 < 10)
+		cout<<(char)((x / 16) + '0');
+	if(x / 16 >= 10)
+		cout<<(char)((x / 16 - 10) + 'A');
+
+	if(x % 16 < 10)
+		cout<<(char)((x % 16) + '0');
+	if(x % 16 >= 10)
+		cout<<(char)((x % 16) + 'A');
+}
+
 int main(){
 	unsigned char message[] = "This is a message me will encrypt usign AES";
 	unsigned char key[16] = {
@@ -223,7 +236,31 @@ int main(){
 		13, 14, 15, 16,
 	};
 	
-	AES_Encrypt(message, key);
+	int originalLen = strlen((const char*) message);
+	int lenOfPaddedMessage = originalLen;
+
+	if(lenOfPaddedMessage % 16 == 0)
+		lenOfPaddedMessage = (lenOfPaddedMessage / 16 + 1) * 16;
+
+	unsigned char* paddedMessage = new unsigned char[lenOfPaddedMessage];
+	for(int i = 0; i < lenOfPaddedMessage; i++){
+		if(i >= originalLen)
+			paddedMessage[i] = 0;
+		else
+			paddedMessage[i] = message[i];
+	}
+
+	// encrypt padded message: 
+	for(int i = 0; i < lenOfPaddedMessage; i += 16)
+		AES_Encrypt(paddedMessage + i, key);
+
+	cout<<"\nEncrypted Message: "<<endl;
+	for(int i = 0; i < lenOfPaddedMessage; i++){
+		printHex(paddedMessage[i]);
+		cout<<" ";
+	}
+
+	delete[] paddedMessage;
 
 	return 0;
 }

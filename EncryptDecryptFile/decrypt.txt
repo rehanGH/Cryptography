@@ -1,0 +1,10 @@
+encrypt() function is used to handle the encryption of the input file. 
+The file handling code is included in the encrypt() function to read the file and write to the file. 
+A new encrypted file called encrypt.txt  is generated with all the encrypted data in it.
+The encrypted file is encrypted using a key that is being inputted by the user.
+
+
+
+decrypt() function is used to read the encrypted file and decrypt the data and generate a new file decrypt.txt. 
+To decrypt a file, a key is requested from the user. 
+If the correct key is entered, then the file is successfully decrypted.
